@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/gorilla/mux"
 	"log"
 	"net/http"
 )
@@ -29,8 +30,8 @@ func getProductList(w http.ResponseWriter, r *http.Request) {
 }
 
 func getProductDetail(w http.ResponseWriter, r *http.Request) {
-	log.Println(r.URL.Path)
-	key := r.URL.Path[len("/product/"):]
+	vars := mux.Vars(r)
+	key := vars["productId"]
 	for _, Product := range Products {
 		if string(Product.Id) == key {
 			json.NewEncoder(w).Encode(Product)
@@ -40,10 +41,11 @@ func getProductDetail(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleRequests() {
-	http.HandleFunc("/products/", getProductList)
-	http.HandleFunc("/product/", getProductDetail)
-	http.HandleFunc("/", homePage)
-	err := http.ListenAndServe(":10000", nil)
+	muxRouter := mux.NewRouter().StrictSlash(true)
+	muxRouter.HandleFunc("/products/", getProductList)
+	muxRouter.HandleFunc("/products/{productId}", getProductDetail)
+	muxRouter.HandleFunc("/", homePage)
+	err := http.ListenAndServe(":10000", muxRouter)
 	if err != nil {
 		return
 	}
