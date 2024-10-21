@@ -23,6 +23,11 @@ run:
 down:
 	@docker compose -f $(DOCKER_COMPOSE_FILE) down
 
+# Build the Go application in Docker
+.PHONY: build
+build:
+	$(GO_IMAGE) go build
+
 # Clean up Docker containers and images
 .PHONY: clean
 clean:
