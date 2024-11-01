@@ -26,7 +26,12 @@ down:
 # Build the Go application in Docker
 .PHONY: build
 build:
-	$(GO_IMAGE) go build
+	go build
+
+# Run the application
+.PHONY: run-build
+run-build:
+	./product-hub
 
 # Clean up Docker containers and images
 .PHONY: clean
