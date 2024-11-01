@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
@@ -15,9 +16,9 @@ type App struct {
 }
 
 func (app *App) Initialize() error {
-	connection := fmt.Sprintf("%v:%v@tcp(127.0.0.1:3306)/%v", DB_USER, DB_PASSWORD, DATABASE_NAME)
+	connectionString := fmt.Sprintf("%v:%v@tcp(127.0.0.1:3306)/%v", DbUser, DbPassword, DatabaseName)
 	var err error
-	app.DB, err = sql.Open("mysql", connection)
+	app.DB, err = sql.Open("mysql", connectionString)
 	if err != nil {
 		return err
 	}
@@ -39,11 +40,17 @@ func sendResponse(w http.ResponseWriter, statusCode int, payload interface{}) {
 }
 
 func sendError(w http.ResponseWriter, statusCode int, err string) {
-	errMessage := map[string]string{"error": err}
-	sendResponse(w, statusCode, errMessage)
+	sendResponse(w, statusCode, map[string]string{"error": err})
 }
 
-func (app *App) getProducts(w http.ResponseWriter, r *http.Request) {
+func (app *App) getHome(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Home page")
+	response := map[string]string{"message": "Welcome to the Product Hub API!"}
+	sendResponse(w, http.StatusOK, response)
+}
+
+func (app *App) getProductList(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Product list")
 	products, err := getProducts(app.DB)
 	if err != nil {
 		sendError(w, http.StatusInternalServerError, err.Error())
@@ -54,6 +61,6 @@ func (app *App) getProducts(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *App) handleRoutes() {
-	fmt.Println("Starting server on port 8080")
-	app.Router.HandleFunc("/products", app.getProducts).Methods("GET").Name("GetProducts")
+	app.Router.HandleFunc("/", app.getHome).Methods("GET").Name("home")
+	app.Router.HandleFunc("/products", app.getProductList).Methods("GET").Name("home")
 }
