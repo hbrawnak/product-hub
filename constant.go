@@ -1,5 +1,5 @@
 package main
 
-const DATABASE_NAME = "productdb"
-const DB_USER = "user"
-const DB_PASSWORD = "password"
+const DatabaseName = "productdb"
+const DbUser = "user"
+const DbPassword = "password"
