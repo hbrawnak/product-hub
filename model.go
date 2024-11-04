@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 )
 
@@ -56,4 +57,15 @@ func (p *Product) createProduct(db *sql.DB) error {
 
 	p.ID = int(id)
 	return nil
+}
+
+func (p *Product) updateProduct(db *sql.DB) error {
+	query := fmt.Sprintf("update products set name = '%v', quantity = %v, price = %v where id = %v", p.Name, p.Quantity, p.Price, p.ID)
+	result, err := db.Exec(query)
+	rowAffected, err := result.RowsAffected()
+	if rowAffected == 0 {
+		return errors.New("product does not exist")
+	}
+
+	return err
 }

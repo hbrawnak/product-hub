@@ -64,3 +64,29 @@ func (app *App) CreateProduct(w http.ResponseWriter, r *http.Request) {
 
 	sendResponse(w, http.StatusCreated, product)
 }
+
+func (app *App) UpdateProduct(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	productId, err := strconv.Atoi(vars["id"])
+
+	if err != nil {
+		sendError(w, http.StatusInternalServerError, "Invalid product id")
+		return
+	}
+
+	var product Product
+
+	err = json.NewDecoder(r.Body).Decode(&product)
+	if err != nil {
+		sendError(w, http.StatusBadRequest, "Invalid request payload")
+		return
+	}
+
+	product.ID = productId
+	err = product.updateProduct(app.DB)
+	if err != nil {
+		sendError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	sendResponse(w, http.StatusOK, product)
+}
