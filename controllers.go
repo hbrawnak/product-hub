@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"encoding/json"
 	"github.com/gorilla/mux"
 	"net/http"
 	"strconv"
@@ -44,4 +45,22 @@ func (app *App) GetProductById(w http.ResponseWriter, r *http.Request) {
 	}
 
 	sendResponse(w, http.StatusOK, product)
+}
+
+func (app *App) CreateProduct(w http.ResponseWriter, r *http.Request) {
+	var product Product
+
+	err := json.NewDecoder(r.Body).Decode(&product)
+	if err != nil {
+		sendError(w, http.StatusBadRequest, "Invalid request payload")
+		return
+	}
+
+	err = product.createProduct(app.DB)
+	if err != nil {
+		sendError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	sendResponse(w, http.StatusCreated, product)
 }
