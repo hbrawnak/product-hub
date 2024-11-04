@@ -7,4 +7,5 @@ func (app *App) handleRoutes() {
 	products := app.Router.PathPrefix("/api/products").Subrouter()
 	products.HandleFunc("/", app.GetProductList).Methods("GET").Name("product-list")
 	products.HandleFunc("/{id}", app.GetProductById).Methods("GET").Name("product-details")
+	products.HandleFunc("/", app.CreateProduct).Methods("POST").Name("create-product")
 }
