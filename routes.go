@@ -9,4 +9,5 @@ func (app *App) handleRoutes() {
 	products.HandleFunc("/{id}", app.GetProductById).Methods("GET").Name("product-details")
 	products.HandleFunc("/", app.CreateProduct).Methods("POST").Name("create-product")
 	products.HandleFunc("/{id}", app.UpdateProduct).Methods("PUT").Name("update-product")
+	products.HandleFunc("/{id}", app.DeleteProduct).Methods("DELETE").Name("delete-product")
 }

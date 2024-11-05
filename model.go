@@ -69,3 +69,14 @@ func (p *Product) updateProduct(db *sql.DB) error {
 
 	return err
 }
+
+func (p *Product) DeleteProduct(db *sql.DB) error {
+	query := fmt.Sprintf("delete from products where id = %v", p.ID)
+	result, err := db.Exec(query)
+	rowAffected, err := result.RowsAffected()
+	if rowAffected == 0 {
+		return errors.New("product does not exist")
+	}
+
+	return err
+}

@@ -90,3 +90,22 @@ func (app *App) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 	}
 	sendResponse(w, http.StatusOK, product)
 }
+
+func (app *App) DeleteProduct(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	productId, err := strconv.Atoi(vars["id"])
+
+	if err != nil {
+		sendError(w, http.StatusInternalServerError, "Invalid product id")
+		return
+	}
+
+	product := Product{ID: productId}
+
+	err = product.DeleteProduct(app.DB)
+	if err != nil {
+		sendError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	sendResponse(w, http.StatusOK, map[string]string{"result": "success"})
+}
