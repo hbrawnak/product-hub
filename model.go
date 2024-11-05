@@ -43,7 +43,7 @@ func (p *Product) GetProduct(db *sql.DB) error {
 	return nil
 }
 
-func (p *Product) createProduct(db *sql.DB) error {
+func (p *Product) CreateProduct(db *sql.DB) error {
 	query := fmt.Sprintf("insert into products(name, quantity, price) values('%v', %v, %v)", p.Name, p.Quantity, p.Price)
 	result, err := db.Exec(query)
 	if err != nil {
@@ -59,7 +59,7 @@ func (p *Product) createProduct(db *sql.DB) error {
 	return nil
 }
 
-func (p *Product) updateProduct(db *sql.DB) error {
+func (p *Product) UpdateProduct(db *sql.DB) error {
 	query := fmt.Sprintf("update products set name = '%v', quantity = %v, price = %v where id = %v", p.Name, p.Quantity, p.Price, p.ID)
 	result, err := db.Exec(query)
 	rowAffected, err := result.RowsAffected()

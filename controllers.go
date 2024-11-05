@@ -56,7 +56,7 @@ func (app *App) CreateProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = product.createProduct(app.DB)
+	err = product.CreateProduct(app.DB)
 	if err != nil {
 		sendError(w, http.StatusInternalServerError, err.Error())
 		return
@@ -83,7 +83,7 @@ func (app *App) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 	}
 
 	product.ID = productId
-	err = product.updateProduct(app.DB)
+	err = product.UpdateProduct(app.DB)
 	if err != nil {
 		sendError(w, http.StatusInternalServerError, err.Error())
 		return
