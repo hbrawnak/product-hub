@@ -33,6 +33,11 @@ make run-build  # Build and run locally
 
 ```
 
+## Test the endpoints
+```
+go test
+```
+
 ## API Endpoints
 ```
 Method  Endpoint	        Description
