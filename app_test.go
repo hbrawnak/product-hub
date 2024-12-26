@@ -95,3 +95,21 @@ func TestCreateProduct(t *testing.T) {
 		t.Errorf("Expected price: %v, Received: %v", 10.0, m["price"])
 	}
 }
+
+func TestDeleteProduct(t *testing.T) {
+	clearTable()
+
+	addProduct("pens", 20, 5)
+
+	req, _ := http.NewRequest("GET", "/api/products/1", nil)
+	response := sendRequest(req)
+	checkStatusCode(t, http.StatusOK, response.Code)
+
+	req, _ = http.NewRequest("DELETE", "/api/products/1", nil)
+	response = sendRequest(req)
+	checkStatusCode(t, http.StatusOK, response.Code)
+
+	req, _ = http.NewRequest("GET", "/api/products/1", nil)
+	response = sendRequest(req)
+	checkStatusCode(t, http.StatusNotFound, response.Code)
+}
