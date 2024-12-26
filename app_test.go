@@ -1,6 +1,8 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -66,4 +68,77 @@ func sendRequest(request *http.Request) *httptest.ResponseRecorder {
 	recorder := httptest.NewRecorder()
 	app.Router.ServeHTTP(recorder, request)
 	return recorder
+}
+
+func TestCreateProduct(t *testing.T) {
+	clearTable()
+
+	var product = []byte(`{"name": "Chair", "quantity": 5, "price": 10}`)
+	req, _ := http.NewRequest("POST", "/api/products/", bytes.NewBuffer(product))
+	req.Header.Set("Content-Type", "application/json")
+
+	response := sendRequest(req)
+	checkStatusCode(t, http.StatusCreated, response.Code)
+
+	var m map[string]interface{}
+	json.Unmarshal(response.Body.Bytes(), &m)
+
+	if m["name"] != "Chair" {
+		t.Errorf("Expected name: %v, Received: %v", "Chair", m["name"])
+	}
+
+	if m["quantity"] != 5.0 {
+		t.Errorf("Expected quantity: %v, Received: %v", 5.0, m["quantity"])
+	}
+
+	if m["price"] != 10.0 {
+		t.Errorf("Expected price: %v, Received: %v", 10.0, m["price"])
+	}
+}
+
+func TestDeleteProduct(t *testing.T) {
+	clearTable()
+
+	addProduct("pens", 20, 5)
+
+	req, _ := http.NewRequest("GET", "/api/products/1", nil)
+	response := sendRequest(req)
+	checkStatusCode(t, http.StatusOK, response.Code)
+
+	req, _ = http.NewRequest("DELETE", "/api/products/1", nil)
+	response = sendRequest(req)
+	checkStatusCode(t, http.StatusOK, response.Code)
+
+	req, _ = http.NewRequest("GET", "/api/products/1", nil)
+	response = sendRequest(req)
+	checkStatusCode(t, http.StatusNotFound, response.Code)
+}
+
+func TestUpdateProduct(t *testing.T) {
+	clearTable()
+
+	addProduct("Connector", 10, 150)
+
+	req, _ := http.NewRequest("GET", "/api/products/1", nil)
+	response := sendRequest(req)
+	checkStatusCode(t, http.StatusOK, response.Code)
+
+	var existingProduct map[string]interface{}
+	json.Unmarshal(response.Body.Bytes(), &existingProduct)
+
+	// Updating product quantity
+	var product = []byte(`{"name": "Connector", "quantity": 15, "price": 150}`)
+	req, _ = http.NewRequest("PUT", "/api/products/1", bytes.NewBuffer(product))
+	req.Header.Set("Content-Type", "application/json")
+	response = sendRequest(req)
+	var updatedProduct map[string]interface{}
+	json.Unmarshal(response.Body.Bytes(), &updatedProduct)
+
+	if existingProduct["id"] != updatedProduct["id"] {
+		t.Errorf("Expected id: %v, Received: %v", updatedProduct["id"], existingProduct["id"])
+	}
+
+	if updatedProduct["quantity"] != 15.0 {
+		t.Errorf("Expected quantity: %v, Received: %v", 15.0, updatedProduct["quantity"])
+	}
 }
