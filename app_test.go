@@ -113,3 +113,32 @@ func TestDeleteProduct(t *testing.T) {
 	response = sendRequest(req)
 	checkStatusCode(t, http.StatusNotFound, response.Code)
 }
+
+func TestUpdateProduct(t *testing.T) {
+	clearTable()
+
+	addProduct("Connector", 10, 150)
+
+	req, _ := http.NewRequest("GET", "/api/products/1", nil)
+	response := sendRequest(req)
+	checkStatusCode(t, http.StatusOK, response.Code)
+
+	var existingProduct map[string]interface{}
+	json.Unmarshal(response.Body.Bytes(), &existingProduct)
+
+	// Updating product quantity
+	var product = []byte(`{"name": "Connector", "quantity": 15, "price": 150}`)
+	req, _ = http.NewRequest("PUT", "/api/products/1", bytes.NewBuffer(product))
+	req.Header.Set("Content-Type", "application/json")
+	response = sendRequest(req)
+	var updatedProduct map[string]interface{}
+	json.Unmarshal(response.Body.Bytes(), &updatedProduct)
+
+	if existingProduct["id"] != updatedProduct["id"] {
+		t.Errorf("Expected id: %v, Received: %v", updatedProduct["id"], existingProduct["id"])
+	}
+
+	if updatedProduct["quantity"] != 15.0 {
+		t.Errorf("Expected quantity: %v, Received: %v", 15.0, updatedProduct["quantity"])
+	}
+}
